@@ -1,41 +1,38 @@
-from flask import Flask
+import os
+import json
 import threading
+from flask import Flask
 import discord
 from discord.ext import commands
-import os
 from dotenv import load_dotenv
 
 load_dotenv()
 
-intents = discord.Intents.default()
-intents.messages = True
-intents.message_content = True
-
-bot = commands.Bot(command_prefix="!", intents=intents)
-
+# Initialize Flask app
 app = Flask(__name__)
-
 
 @app.route('/')
 def home():
     return "Bot is running!"
 
 def run_flask():
+    # Flask server running in a separate thread
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
 
 # Start Flask in a separate thread so that the bot can still run
-threading.Thread(target=run_flask).start()
+threading.Thread(target=run_flask, daemon=True).start()
 
-# Fetch the token and channel IDs from environment variables
-TOKEN = os.getenv('DISCORD_BOT_TOKEN')
-INPUT_CHANNEL_ID = int(os.getenv('INPUT_CHANNEL_ID'))
-STORAGE_CHANNEL_ID = int(os.getenv('STORAGE_CHANNEL_ID'))
-
+# Initialize Discord Bot
 intents = discord.Intents.default()
 intents.messages = True
 intents.message_content = True
 
 bot = commands.Bot(command_prefix="!", intents=intents)
+
+# Fetch the token and channel IDs from environment variables
+TOKEN = os.getenv('DISCORD_BOT_TOKEN')
+INPUT_CHANNEL_ID = int(os.getenv('INPUT_CHANNEL_ID'))
+STORAGE_CHANNEL_ID = int(os.getenv('STORAGE_CHANNEL_ID'))
 
 # Data
 tasks = []
@@ -45,7 +42,6 @@ task_message = None
 async def save_data():
     global storage_message
     storage_channel = bot.get_channel(STORAGE_CHANNEL_ID)
-
     if not storage_channel:
         print("Storage channel not found!")
         return
@@ -64,7 +60,6 @@ async def save_data():
 async def load_data():
     global storage_message, tasks
     storage_channel = bot.get_channel(STORAGE_CHANNEL_ID)
-
     if not storage_channel:
         print("Storage channel not found!")
         return
@@ -86,11 +81,9 @@ async def load_data():
 async def create_new_storage_message():
     global storage_message
     storage_channel = bot.get_channel(STORAGE_CHANNEL_ID)
-
     if not storage_channel:
         print("Storage channel not found!")
         return
-
     storage_message = await storage_channel.send("```json\n[]\n```")
 
 async def find_task_message():
