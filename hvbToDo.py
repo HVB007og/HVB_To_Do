@@ -1,6 +1,7 @@
 import os
 import json
 import threading
+import asyncio
 from flask import Flask
 import discord
 from discord.ext import commands
@@ -118,11 +119,11 @@ async def on_message(message):
     content = message.content.strip()
 
     if not content.startswith(".") and not content.lower().startswith(("del ", "add", ">clear_hvb_to_do")):
-        await message.delete()
         warning = await message.channel.send(
             "⚠️ Invalid input! Please start your message with a period (.)",
             delete_after=5
         )
+        await message.delete()
         return
 
     if content.lower().startswith("del "):
@@ -188,9 +189,11 @@ async def on_message(message):
         if input_channel:
             async for msg in input_channel.history(limit=None):
                 try:
-                    await msg.delete()
-                except:
-                    pass
+                    if msg.deletable:
+                        await msg.delete()
+                        await asyncio.sleep(0.5)  # Sleep to avoid hitting rate limits
+                except Exception as e:
+                    print(f"Failed to delete message: {e}")
 
         task_message = await input_channel.send("📜 Task list is currently empty.")
         await save_data()
