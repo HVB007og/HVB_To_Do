@@ -1,12 +1,30 @@
+from flask import Flask
+import threading
 import discord
 from discord.ext import commands
-import json
-import asyncio
 import os
 from dotenv import load_dotenv
 
-# Load environment variables
 load_dotenv()
+
+intents = discord.Intents.default()
+intents.messages = True
+intents.message_content = True
+
+bot = commands.Bot(command_prefix="!", intents=intents)
+
+app = Flask(__name__)
+
+
+@app.route('/')
+def home():
+    return "Bot is running!"
+
+def run_flask():
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
+
+# Start Flask in a separate thread so that the bot can still run
+threading.Thread(target=run_flask).start()
 
 # Fetch the token and channel IDs from environment variables
 TOKEN = os.getenv('DISCORD_BOT_TOKEN')
