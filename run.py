@@ -11,7 +11,12 @@ def run_bot_and_server():
 
     print("Starting Gunicorn server...")
     # Start Gunicorn as a background process
-    gunicorn_process = subprocess.Popen(gunicorn_command)
+    # Redirect stdout and stderr to the parent's streams to see its output in logs
+    gunicorn_process = subprocess.Popen(
+        gunicorn_command,
+        stdout=sys.stdout,
+        stderr=sys.stderr
+    )
 
     print("Starting Discord bot...")
     # On Windows, the default event loop policy can sometimes cause issues
