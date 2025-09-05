@@ -19,10 +19,10 @@ class TaskCog(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         """Called when the bot is ready."""
-        print(f"Logged in as {self.bot.user}")
+        print(f"Logged in as {self.bot.user}", flush=True)
         await self._load_data()
         await self._find_task_message()
-        print("✅ Bot is ready and data is loaded.")
+        print("✅ Bot is ready and data is loaded.", flush=True)
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
@@ -114,19 +114,19 @@ class TaskCog(commands.Cog):
         """Find the existing task list message on startup."""
         channel = self.bot.get_channel(INPUT_CHANNEL_ID)
         if not channel:
-            print("❌ Input channel not found!")
+            print("❌ Input channel not found!", flush=True)
             return
         async for message in channel.history(limit=50):
             if message.author == self.bot.user and (message.content.startswith("1. ") or "Task list is currently empty" in message.content):
                 self.task_message = message
-                print("✅ Found existing task list message.")
+                print("✅ Found existing task list message.", flush=True)
                 return
 
     async def _load_data(self):
         """Load tasks from the storage channel."""
         channel = self.bot.get_channel(STORAGE_CHANNEL_ID)
         if not channel:
-            print("❌ Storage channel not found!")
+            print("❌ Storage channel not found!", flush=True)
             return
         async for message in channel.history(limit=1):
             self.storage_message = message
@@ -139,19 +139,19 @@ class TaskCog(commands.Cog):
                 else:
                     self.tasks = []
             except (json.JSONDecodeError, AttributeError) as e:
-                print(f"⚠️ Could not load or parse tasks: {e}. Starting fresh.")
+                print(f"⚠️ Could not load or parse tasks: {e}. Starting fresh.", flush=True)
                 self.tasks = []
             return # We only care about the most recent message
 
         # If no message was found, we start with an empty list
-        print("No storage message found. Starting with an empty task list.")
+        print("No storage message found. Starting with an empty task list.", flush=True)
         self.tasks = []
 
     async def _save_data(self):
         """Save the current tasks to the storage channel."""
         channel = self.bot.get_channel(STORAGE_CHANNEL_ID)
         if not channel:
-            print("❌ Storage channel not found!")
+            print("❌ Storage channel not found!", flush=True)
             return
 
         data_text = json.dumps(self.tasks, indent=2)
@@ -163,5 +163,5 @@ class TaskCog(commands.Cog):
             else:
                 self.storage_message = await channel.send(content)
         except discord.errors.NotFound:
-            print("Storage message was deleted. Creating a new one.")
+            print("Storage message was deleted. Creating a new one.", flush=True)
             self.storage_message = await channel.send(content)

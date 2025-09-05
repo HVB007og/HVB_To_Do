@@ -9,7 +9,7 @@ def run_bot_and_server():
     # It will run the Flask app defined in the 'app.py' file
     gunicorn_command = ["gunicorn", "app:app", "--bind", "0.0.0.0:10000"]
 
-    print("Starting Gunicorn server...")
+    print("Starting Gunicorn server...", flush=True)
     # Start Gunicorn as a background process
     # Redirect stdout and stderr to the parent's streams to see its output in logs
     gunicorn_process = subprocess.Popen(
@@ -18,7 +18,7 @@ def run_bot_and_server():
         stderr=sys.stderr
     )
 
-    print("Starting Discord bot...")
+    print("Starting Discord bot...", flush=True)
     # On Windows, the default event loop policy can sometimes cause issues
     if sys.platform == "win32":
         asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
@@ -26,7 +26,7 @@ def run_bot_and_server():
     try:
         asyncio.run(main())
     except KeyboardInterrupt:
-        print("Shutting down bot and server...")
+        print("Shutting down bot and server...", flush=True)
     finally:
         gunicorn_process.terminate() # Ensure Gunicorn is stopped when the bot stops
 
