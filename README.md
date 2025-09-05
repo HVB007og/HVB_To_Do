@@ -21,17 +21,17 @@ The bot operates primarily in a designated "input" channel. It maintains a singl
 
 All commands are sent in the designated input channel.
 
-### Add a Task
-Prefix your message with a period (`.`) to add it as a new task.
+### Chat in the Channel 
+To send a normal message that is not a command, simply start it with a period (.). The bot will ignore it, allowing for conversation. 
 ```
-. Pick up milk
+. Hey everyone, are we out of electrical tape?
 ```
 
-### Add Multiple Tasks
-Use the `add` prefix followed by tasks on new lines.
+### Add Tasks
+Use the `add` prefix to add one or more tasks. For multiple tasks, place each on a new line.
 ```
-add Buy eggs
-Buy bread
+add flux
+Buy wires
 ```
 
 ### Complete a Task
