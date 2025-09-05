@@ -5,16 +5,6 @@ services:
     env: python
     plan: free # or your desired plan
     buildCommand: "pip install -r requirements.txt"
-    startCommand: "gunicorn app:app"
-    envVars:
-      - fromGroup: hvb-todo-env
-
-  # A background worker for the Discord bot
-  - type: worker
-    name: hvb-todo-bot-worker
-    env: python
-    plan: free # or your desired plan
-    buildCommand: "pip install -r requirements.txt"
     startCommand: "python run.py"
     envVars:
       - fromGroup: hvb-todo-env
