@@ -1,0 +1,30 @@
+services:
+  # A web service for the keep-alive endpoint
+  - type: web
+    name: hvb-todo-bot-web
+    env: python
+    plan: free # or your desired plan
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "gunicorn keep_alive:app"
+    envVars:
+      - fromGroup: hvb-todo-env
+
+  # A background worker for the Discord bot
+  - type: worker
+    name: hvb-todo-bot-worker
+    env: python
+    plan: free # or your desired plan
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "python run.py"
+    envVars:
+      - fromGroup: hvb-todo-env
+
+envVarGroups:
+  - name: hvb-todo-env
+    envVars:
+      - key: DISCORD_BOT_TOKEN
+        value: "" # Add your values in the Render dashboard
+      - key: INPUT_CHANNEL_ID
+        value: "" # Add your values in the Render dashboard
+      - key: STORAGE_CHANNEL_ID
+        value: "" # Add your values in the Render dashboard

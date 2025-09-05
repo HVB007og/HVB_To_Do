@@ -12,9 +12,6 @@ intents.message_content = True
 bot = commands.Bot(command_prefix="!", intents=intents)
 
 async def main():
-    # Start the keep-alive server
-    run_flask()
-
     from cogs.task_cog import TaskCog
     async with bot:
         await bot.add_cog(TaskCog(bot))
