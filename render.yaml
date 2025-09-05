@@ -5,7 +5,7 @@ services:
     env: python
     plan: free # or your desired plan
     buildCommand: "pip install -r requirements.txt"
-    startCommand: "gunicorn keep_alive:app"
+    startCommand: "gunicorn app:app"
     envVars:
       - fromGroup: hvb-todo-env
 

@@ -1,5 +1,4 @@
 import asyncio
-from keep_alive import run_flask
 from config import TOKEN
 import discord
 from discord.ext import commands
