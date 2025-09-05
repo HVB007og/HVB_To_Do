@@ -53,13 +53,22 @@ class TaskCog(commands.Cog):
         elif content.lower() == ">clear_hvb_to_do":
             await self._clear_tasks()
             await message.delete()
+        
+        # If the message is not a valid command or a chat message, delete it and warn the user.
+        else:
+            # A message is valid if it's for chat or is a known command. Otherwise, it's invalid.
+            is_chat = content.startswith('.')
+            is_known_command = content.lower().startswith(('add ', 'del ', '>clear_hvb_to_do'))
 
-        # This is for messages that are just tasks, e.g., ". My new task"
-        elif content.startswith("."):
-            task_text = content[1:].strip()
-            if task_text:
-                await self._add_tasks([task_text], message.channel)
-            await message.delete()
+            if not is_chat and not is_known_command:
+                await message.channel.send(
+                    "⚠️ Please start your message with a period (.) to chat, or `add`/`del` to interact with the list.",
+                    delete_after=10
+                )
+                try:
+                    await message.delete()
+                except discord.errors.NotFound:
+                    pass # Message was already deleted, which is fine.
 
     async def _update_task_message(self, channel: discord.TextChannel):
         """Edit the existing task message or send a new one."""
