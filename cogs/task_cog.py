@@ -32,43 +32,44 @@ class TaskCog(commands.Cog):
 
         content = message.content.strip()
 
-        # Command-like processing
-        if content.lower().startswith("del "):
+        # Command processing logic
+        cmd = content.lower()
+
+        if cmd.startswith("del "):
             try:
                 numbers = [int(n) for n in content[4:].split()]
-                await self._delete_tasks(numbers, message.channel)
+                if numbers:
+                    await self._delete_tasks(numbers, message.channel)
+                else:
+                    await message.channel.send("⚠️ Please provide task numbers after `del`.", delete_after=5)
             except ValueError:
                 await message.channel.send("❌ Please provide valid task numbers to delete.", delete_after=5)
             finally:
                 await message.delete()
 
-        elif content.lower().startswith("add "):
+        elif cmd.startswith("add "):
             task_lines = [line.strip() for line in content[4:].strip().split("\n") if line.strip()]
             if task_lines:
                 await self._add_tasks(task_lines, message.channel)
             else:
-                await message.channel.send("⚠️ No tasks provided to add.", delete_after=5)
+                await message.channel.send("⚠️ Please provide a task to add after `add`.", delete_after=5)
             await message.delete()
 
-        elif content.lower() == ">clear_hvb_to_do":
+        elif cmd == ">clear_hvb_to_do":
             await self._clear_tasks()
             await message.delete()
-        
-        # If the message is not a valid command or a chat message, delete it and warn the user.
-        else:
-            # A message is valid if it's for chat or is a known command. Otherwise, it's invalid.
-            is_chat = content.startswith('.')
-            is_known_command = content.lower().startswith(('add ', 'del ', '>clear_hvb_to_do'))
 
-            if not is_chat and not is_known_command:
+        # Handle non-command messages
+        elif not content.startswith('.'):
+            # This is not a command and not a chat message, so it's an invalid format.
+            try:
                 await message.channel.send(
                     "⚠️ Please start your message with a period (.) to chat, or `add`/`del` to interact with the list.",
                     delete_after=10
                 )
-                try:
-                    await message.delete()
-                except discord.errors.NotFound:
-                    pass # Message was already deleted, which is fine.
+                await message.delete()
+            except discord.errors.NotFound:
+                pass # Message was already deleted, which is fine.
 
     async def _update_task_message(self, channel: discord.TextChannel):
         """Edit the existing task message or send a new one."""
@@ -115,12 +116,15 @@ class TaskCog(commands.Cog):
             backup = format_task_list(self.tasks)
             await storage_channel.send(f"📦 Backup before clearing:\n```txt\n{backup}\n```")
 
+        # Clear tasks in memory and save the empty state first
         self.tasks.clear()
+        await self._save_data()
         print("🧹 Cleared all tasks.", flush=True)
-        await input_channel.purge(limit=100) # Purge messages
+
+        # Now, clean up the user-facing channel
+        await input_channel.purge(limit=None) # Purge all messages
         self.task_message = None # Reset message reference
         await self._update_task_message(input_channel)
-        await self._save_data()
 
     async def _find_task_message(self):
         """Find the existing task list message on startup."""
