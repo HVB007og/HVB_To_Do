@@ -84,6 +84,7 @@ class TaskCog(commands.Cog):
     async def _add_tasks(self, new_tasks, channel):
         """Add new tasks to the list."""
         self.tasks.extend(new_tasks)
+        print(f"📝 Added {len(new_tasks)} task(s).", flush=True)
         await self._update_task_message(channel)
         await self._save_data()
 
@@ -99,6 +100,7 @@ class TaskCog(commands.Cog):
             else:
                 await channel.send(f"❌ Invalid task number: {number}", delete_after=5)
         
+        print(f"🗑️ Marked {len(numbers)} task(s) as complete.", flush=True)
         await self._update_task_message(channel)
         await self._save_data()
 
@@ -114,6 +116,7 @@ class TaskCog(commands.Cog):
             await storage_channel.send(f"📦 Backup before clearing:\n```txt\n{backup}\n```")
 
         self.tasks.clear()
+        print("🧹 Cleared all tasks.", flush=True)
         await input_channel.purge(limit=100) # Purge messages
         self.task_message = None # Reset message reference
         await self._update_task_message(input_channel)
