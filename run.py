@@ -2,12 +2,14 @@ import asyncio
 import sys
 import subprocess
 from main import main
+from config import PORT
 
 def run_bot_and_server():
     """Starts the Gunicorn server as a subprocess and then runs the bot."""
     # Command to start Gunicorn
     # It will run the Flask app defined in the 'app.py' file
-    gunicorn_command = ["gunicorn", "app:app", "--bind", "0.0.0.0:10000"]
+    # Render provides a PORT environment variable that the web service must bind to.
+    gunicorn_command = ["gunicorn", "app:app", "--bind", f"0.0.0.0:{PORT}"]
 
     print("Starting Gunicorn server...", flush=True)
     # Start Gunicorn as a background process
